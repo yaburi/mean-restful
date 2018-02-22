@@ -12,6 +12,9 @@ $(document).ready(function() {
     // Delete User link click
     $('#userList table tbody').on('click', 'td a.linkdeleteuser', deleteUser);
 
+    // Edit User link click
+    $('#userList table tbody').on('click', 'td a.linkedituser', editUser);
+
     // Populate the user table on initial page load
     populateTable();
 });
@@ -34,7 +37,10 @@ function populateTable() {
             tableContent += '<tr>';
             tableContent += '<td><a href="#" class="linkshowuser" rel="' + this.username + '">' + this.username + '</a></td>';
             tableContent += '<td>' + this.email + '</td>';
-            tableContent += '<td><a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></td>';
+            tableContent += '<td><a href="#" class="linkdeleteuser" rel="' + this._id +
+                '">delete</a></td>';
+            tableContent += '<td><a href="#" class="linkedituser" rel="' + this._id +
+                '">edit</a></td>';
             tableContent += '</tr>';
         });
 
@@ -150,4 +156,30 @@ function deleteUser(event) {
         // No to confirmation
         return false;
     }
+}
+
+// Edit User
+function editUser(event) {
+    event.preventDefault();
+
+    // Retrieve username from link rel attribute
+    var thisId = $(this).attr('rel');
+
+    // Get index of object based on id value
+    // Using .map to create a new array of usernames. Sets arrayPosition to the index of each username
+    var arrayPosition = userListData.map(function(arrayItem) { return arrayItem._id; }).indexOf(thisId);
+
+    // Get our User object
+    var thisUserObject = userListData[arrayPosition];
+
+    // Populate edit form
+    $('#inputEditUserName').val(thisUserObject.username);
+    $('#inputEditUserEmail').val(thisUserObject.email);
+
+    $('#inputEditUserFullname').val(thisUserObject.fullname);
+    $('#inputEditUserAge').val(thisUserObject.age);
+
+    $('#inputEditUserLocation').val(thisUserObject.location);
+    $('#inputEditUserGender').val(thisUserObject.gender);
+
 }
