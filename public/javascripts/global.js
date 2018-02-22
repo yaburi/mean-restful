@@ -13,7 +13,10 @@ $(document).ready(function() {
     $('#userList table tbody').on('click', 'td a.linkdeleteuser', deleteUser);
 
     // Edit User link click
-    $('#userList table tbody').on('click', 'td a.linkedituser', editUser);
+    $('#userList table tbody').on('click', 'td a.linkedituser', fillEditForm);
+
+    // Edit User button click
+    $('#btnEditUser').on('click', saveEditUser);
 
     // Populate the user table on initial page load
     populateTable();
@@ -47,6 +50,7 @@ function populateTable() {
         // Inject the whole content string into our existing HTML table
         $('#userList table tbody').html(tableContent);
     });
+
 };
 
 // Show user info
@@ -159,7 +163,7 @@ function deleteUser(event) {
 }
 
 // Edit User
-function editUser(event) {
+function fillEditForm(event) {
     event.preventDefault();
 
     // Retrieve username from link rel attribute
@@ -182,4 +186,79 @@ function editUser(event) {
     $('#inputEditUserLocation').val(thisUserObject.location);
     $('#inputEditUserGender').val(thisUserObject.gender);
 
+    // add the id to the form object
+    $('#editUser').attr('data-uid', thisId);
+}
+
+// Save Edit User
+function saveEditUser(event) {
+    event.preventDefault();
+
+    // Super basic validation - increase errorCount variable if any fields are blank
+    var errorCount = 0;
+    $('#editUser input').each(function(index, val) {
+        if($(this).val() === '') { errorCount++; }
+    });
+
+    // Check and make sure errorCount's still at zero
+    if(errorCount === 0) {
+
+        // If it is, compile all user info into one object
+        var replaceUser = {
+            'uid': $('#editUser').attr('data-uid'),
+            'username': $('#editUser fieldset input#inputEditUserName').val(),
+            'email': $('#editUser fieldset input#inputEditUserEmail').val(),
+            'fullname': $('#editUser fieldset input#inputEditUserFullname').val(),
+            'age': $('#editUser fieldset input#inputEditUserAge').val(),
+            'location': $('#editUser fieldset input#inputEditUserLocation').val(),
+            'gender': $('#editUser fieldset input#inputEditUserGender').val()
+        }
+
+        $.ajax({
+            type: 'PUT',
+            data: replaceUser,
+            url: '/users/edituser/' + replaceUser.uid,
+            dataType: 'JSON'
+        }).done(function(response) {
+
+            // Check for successful (blank) response
+            if (response.msg === '') {
+
+                // Clear the form inputs
+                $('#editUser fieldset input').val('');
+
+                // Update the table
+                populateTable();
+
+
+            } else {
+
+                // If something goes wrong, alert the error message that our service returned
+                alert('Error: ' + response.msg);
+
+            }
+        });
+
+        refreshUserInfo(replaceUser.uid);
+
+    } else {
+        // If errorCount is more than 0, error out
+        alert('Please fill in all fields');
+        return false;
+    }
+}
+
+
+function refreshUserInfo(userId) {
+    var currId = userId;
+    var arrayPosition = userListData.map(function(arrayItem) { return arrayItem._id; }).indexOf(currId);
+
+    // Get our User object
+    var thisUserObject = userListData[arrayPosition];
+
+    // Populate info box
+    $('#userInfoName').text(thisUserObject.fullname);
+    $('#userInfoAge').text(thisUserObject.age);
+    $('#userInfoGender').text(thisUserObject.gender);
+    $('#userInfoLocation').text(thisUserObject.location);
 }
