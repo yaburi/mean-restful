@@ -230,6 +230,15 @@ function saveEditUser(event) {
                 // Update the table
                 populateTable();
 
+                // refreshUserInfo(replaceUser.uid);
+                //$("#userInfoName").html(replaceUser.fullname);
+
+                // Populate info box
+                $('#userInfoName').html(replaceUser.fullname);
+                $('#userInfoAge').html(replaceUser.age);
+                $('#userInfoGender').html(replaceUser.gender);
+                $('#userInfoLocation').html(replaceUser.location);
+
 
             } else {
 
@@ -239,7 +248,7 @@ function saveEditUser(event) {
             }
         });
 
-        refreshUserInfo(replaceUser.uid);
+
 
     } else {
         // If errorCount is more than 0, error out
@@ -250,6 +259,9 @@ function saveEditUser(event) {
 
 
 function refreshUserInfo(userId) {
+
+    event.preventDefault();
+
     var currId = userId;
     var arrayPosition = userListData.map(function(arrayItem) { return arrayItem._id; }).indexOf(currId);
 
@@ -257,8 +269,8 @@ function refreshUserInfo(userId) {
     var thisUserObject = userListData[arrayPosition];
 
     // Populate info box
-    $('#userInfoName').text(thisUserObject.fullname);
-    $('#userInfoAge').text(thisUserObject.age);
-    $('#userInfoGender').text(thisUserObject.gender);
-    $('#userInfoLocation').text(thisUserObject.location);
+    $('#userInfoName').html(thisUserObject.fullname);
+    $('#userInfoAge').html(thisUserObject.age);
+    $('#userInfoGender').html(thisUserObject.gender);
+    $('#userInfoLocation').html(thisUserObject.location);
 }
